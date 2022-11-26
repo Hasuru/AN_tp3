@@ -1,4 +1,4 @@
-\documentclass[12pt, letterpaper]{article}
+\documentclass[12pt, letterpaper,fleqn]{article}
 \usepackage[utf8]{inputenc}
 \usepackage{mathtools}
 \usepackage{indentfirst}
@@ -177,6 +177,138 @@ A função a ser estudade é $f(x) = x^2 + \sin(6x)$ para $x \in \mathopen[-1,1\
         \end{tikzpicture}
     \end{quote}
     
+    \item \textbf{\textit{Spline Cúbico Natural}} - Para a realização dos exercícios sobre o \textit{spline cúbico natural} foi usada a linguagem Python pelo facto de esta ter bibliotecas simples e mais fáceis de utilizar para a resolução do sistema para encontrar os valores dos multiplicadores (\textit{M_i}).
+
+    $$
+    \begin{bmatrix}
+    1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\[6pt]
+    \frac{h}{6} & \frac{2h}{3} & \frac{h}{6} & 0 & 0 & 0 & 0 & 0 \\[6pt]
+    0 & \frac{h}{6} & \frac{2h}{3} & \frac{h}{6} & 0 & 0 & 0 & 0 \\[6pt]
+    0 & 0 & \frac{h}{6} & \frac{2h}{3} & \frac{h}{6} & 0 & 0 & 0 \\[6pt]
+    0 & 0 & 0 & \frac{h}{6} & \frac{2h}{3} & \frac{h}{6} & 0 & 0 \\[6pt]
+    0 & 0 & 0 & 0 & \frac{h}{6} & \frac{2h}{3} & \frac{h}{6} & 0 \\[6pt]
+    0 & 0 & 0 & 0 & 0 & \frac{h}{6} & \frac{2h}{3} & \frac{h}{6} \\[6pt]
+    0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 \\
+    \end{bmatrix}
+    \cdot 
+    \begin{bmatrix}
+    M_0 \\[6pt]
+    M_1 \\[6pt]
+    M_2 \\[6pt]
+    M_3 \\[6pt]
+    M_4 \\[6pt]
+    M_5 \\[6pt]
+    M_6 \\[6pt]
+    M_7 \\[6pt]
+    \end{bmatrix}
+    =
+    \begin{bmatrix}
+    0 \\[6pt] 
+    -6.710 \\[6pt]
+    4.916  \\[6pt]
+    6.596  \\[6pt]
+    -5.515 \\[6pt]
+    -3.691 \\[6pt]
+    7.839  \\[6pt]
+    0 \\[6pt]
+    \end{bmatrix}
+    $$
+    Resolvendo este sistema, usando a biblioteca \textit{numpy} e a função \textit{linalg.solve} da linguagem Python, o resultado é:
+    \begin{equation}
+        M(x)=\begin{cases}
+            M_0 = 0.000   \\
+            M_1 = -42.025 \\
+            M_2 = 27.341  \\
+            M_3 = 35.789  \\
+            M_4 = -32.111 \\
+            M_5 = -23.048 \\
+            M_6 = 46.873  \\
+            M_7 = 0.000       
+        \end{cases}
+    \end{equation}
+    \textbf{\textit{NOTA:}} Todos os valores são arredondados a três casas decimais, já que a linguagem usada apresenta os resultados com uma precisão de 14 casas decimais.
+    
+    Usando os resultados do sistema acima e da expressão geral para construção de $S_i(x)$,
+    \begin{equation}
+    S_i(x) = M_{i-1} \cdot \frac{(x_i - x)^3}{6h_i} + M_i \cdot \frac{(x-x_{i-1})^3}{6h_i}+(f_{i-1} - M_{i-1} \cdot \frac{h_i^2}{6})\cdot \frac{(x_i - x)}{h_i} + (f_i - M_i \cdot \frac{h_i^2}{6})\cdot \frac{(x-x_{i-1})}{h_i}&&
+    \end{equation}
+    obtém-se a seguinte equação do spline cúbico natural:
+    \begin{equation}
+        S(x) = \begin{cases}
+            M_0\frac{(x_1 - x)^3}{6h} + M_1\frac{(x-x_0)^3}{6h}+(f_0 - M_0\frac{h^2}{6})\frac{(x_1 - x)}{h} + (f_1 - M_1\frac{h^2}{6}) \frac{(x-x_0)}{h}, & x_0 \leq x \leq x_1 \\
+            
+            M_1\frac{(x_2 - x)^3}{6h} + M_2\frac{(x-x_1)^3}{6h}+(f_1 - M_1\frac{h^2}{6})\frac{(x_2 - x)}{h} + (f_2 - M_2\frac{h^2}{6}) \frac{(x-x_1)}{h}, & x_1 \leq x \leq x_2 \\
+            
+            M_2\frac{(x_3 - x)^3}{6h} + M_3\frac{(x-x_2)^3}{6h}+(f_2 - M_2\frac{h^2}{6})\frac{(x_3 - x)}{h} + (f_3 - M_3\frac{h^2}{6}) \frac{(x-x_2)}{h}, & x_2 \leq x \leq x_3 \\
+            
+            M_3\frac{(x_4 - x)^3}{6h} + M_4\frac{(x-x_3)^3}{6h}+(f_3 - M_3\frac{h^2}{6})\frac{(x_4 - x)}{h} + (f_4 - M_4\frac{h^2}{6}) \frac{(x-x_3)}{h}, & x_3 \leq x \leq x_4 \\
+
+            M_4\frac{(x_5 - x)^3}{6h} + M_5\frac{(x-x_4)^3}{6h}+(f_4 - M_4\frac{h^2}{6})\frac{(x_5 - x)}{h} + (f_5 - M_5\frac{h^2}{6}) \frac{(x-x_4)}{h}, & x_4 \leq x \leq x_5 \\
+            
+            M_5\frac{(x_6 - x)^3}{6h} + M_6\frac{(x-x_5)^3}{6h}+(f_5 - M_5\frac{h^2}{6})\frac{(x_6 - x)}{h} + (f_6 - M_6\frac{h^2}{6}) \frac{(x-x_5)}{h}, & x_5 \leq x \leq x_6 \\
+            
+            M_6\frac{(x_7 - x)^3}{6h} + M_7\frac{(x-x_6)^3}{6h}+(f_6 - M_6\frac{h^2}{6})\frac{(x_7 - x)}{h} + (f_7 - M_7\frac{h^2}{6}) \frac{(x-x_6)}{h}, & x_6 \leq x \leq x_7 \\
+        \end{cases}    
+    \end{equation}
+    \textbf{\textit{NOTA:}} Optou-se por não se substituir as variáveis e constantes no sistema acima pelos respetivos valores por uma questão de formatação.
+    
+    O código utilizador para a construção do spline foi o seguinte:
+    \begin{verbatim}
+        import numpy as np
+        import matplotlib.pyplot as plt 
+        n = 7, h = 0.286
+        # Abcissas
+        xn = [-1.000, -0.714, -0.428, -0.142, 0.144, 0.430, 0.716, 1.000]
+        
+        # Função f(x) = x² + sin(6x)
+        def f(x):
+            return x**2 + (np.sin(6*x))
+        # Cálculo dos valores de f(xi)
+        fi = []
+        for i in range(n+1):
+            fi += [f(xn[i]]
+        
+        # Função Spline
+        def spline(x):
+            if xn[0] <= x <= xn[1]:
+                return (M[1]*(x-xn[0])**3/(6*h))+(fi[0]*(xn[1]-x)/h) 
+                        +((fi[1]-(M[1]*h**2)/6)*(x-xn[0])/h)
+            (...)
+        # Cálculo do sistema para encontrar os M's
+        A = [ [1, 0, 0, 0, 0, 0, 0, 0],
+              [h/6, 2*h/3, h/6, 0, 0, 0, 0, 0],
+              [0, h/6, 2*h/3, h/6, 0, 0, 0, 0],
+              [0, 0, h/6, 2*h/3, h/6, 0, 0, 0],
+              [0, 0, 0, h/6, 2*h/3, h/6, 0, 0],
+              [0, 0, 0, 0, h/6, 2*h/3, h/6, 0],
+              [0, 0, 0, 0, 0, h/6, 2*h/3, h/6],
+              [0, 0, 0, 0, 0, 0, 0, 1]                                
+            ]
+        B = [0]
+        for i in range (1,n):
+            B += [ (fi[i+1]-fi[i])/h - (fi[i]-fi[i-1])/h ]
+        B += [0]
+        M = np.linalg.solve(A,B)
+        S = np.vectorize(spline)
+        # Gráficos
+        x = np.arange(start = -1, stop = 1, step = 0.001)
+        y = S(x)
+        ff = f(x)
+        y2 = erro_spline(x)
+        plt.plot(x, ff, label = 'f(x)')
+        plt.plot(x, y, 'r-', label = 's(x)')
+    \end{verbatim}
+    
+    O gráfico obtido com o código descrito foi o seguinte:
+    \begin{figure}
+        \includegraphics[width=\linewidth]{ex1-spline.png}
+        \caption{Spline cúbico natural do conjunto de pontos do exercício 1}
+        \label{fig:spline1}
+    \end{figure}
+    %Figure \ref{fig:spline1} shows a the spline
 \end{itemize}
 
+
 \end{document}
+
+
