@@ -28,13 +28,14 @@ Durante este trabalho iremos usufruir de \textbf{métodos de interpolação} de 
 
 \section*{Exercício 1}
 
-A função a ser estudade é $f(x) = x^2 + \sin(6x)$ para $x \in \mathopen[-1,1\mathclose]$
+A função a ser estudada é $f(x) = x^2 + \sin(6x)$ para $x \in \mathopen[-1,1\mathclose]$
 
 \begin{quote}
 \centering
     \begin{tikzpicture}
-        \begin{axis} [xmin=-1, xmax=1, axis lines=middle, xlabel=$x$, ylabel=$y$]
+        \begin{axis} [xmin=-1, xmax=1, axis lines=left, xlabel=$x$, ylabel=$y$]
             \addplot[color=red, samples=200]{x^2 + sin(deg(6*x))};
+            \addlegendentry{$f(x)$}
         \end{axis}
     \end{tikzpicture}
 \end{quote}
@@ -155,29 +156,18 @@ A função a ser estudade é $f(x) = x^2 + \sin(6x)$ para $x \in \mathopen[-1,1\
     \begin{quote}
         \centering
         \begin{tikzpicture}
-            \begin{axis} [xmin=-1, xmax=1, axis lines=middle, xlabel=$x$, ylabel=$y$]
+            \begin{axis} [xmin=-1, xmax=1, axis lines=left, xlabel=$x$, ylabel=$y$]
                 \addplot[color=blue]
                 table[meta=Y]
                 {newtonOut.txt};
-            \end{axis}
-        \end{tikzpicture}
-    \end{quote}
-
-    COMPARACAO COM O F(X) [terminar com o da spline cubica ao lado]
-
-    \begin{quote}
-        \centering
-        \begin{tikzpicture}
-            \begin{axis} [xmin=-1, xmax=1, axis lines=middle, xlabel=$x$, ylabel=$y$]
-                \addplot[color=blue]
-                table[meta=Y]
-                {newtonOut.txt};
+                \addlegendentry{$g(x)$}
                 \addplot[color=red, samples=200]{x^2 + sin(deg(6*x))};
+                \addlegendentry{$f(x)$}
             \end{axis}
         \end{tikzpicture}
     \end{quote}
     
-    \item \textbf{\textit{Spline Cúbico Natural}} - Para a realização dos exercícios sobre o \textit{spline cúbico natural} foi usada a linguagem Python pelo facto de esta ter bibliotecas simples e mais fáceis de utilizar para a resolução do sistema para encontrar os valores dos multiplicadores (\textit{M_i}).
+    \item \textbf{\textit{Spline Cúbico Natural}} - Para a realização dos exercícios sobre o \textit{spline cúbico natural} foi usada a linguagem Python pelo facto de esta ter bibliotecas simples e mais fáceis de utilizar para a resolução do sistema para encontrar os valores dos multiplicadores (\textit{$M_i$}).
 
     $$
     \begin{bmatrix}
@@ -230,7 +220,7 @@ A função a ser estudade é $f(x) = x^2 + \sin(6x)$ para $x \in \mathopen[-1,1\
     
     Usando os resultados do sistema acima e da expressão geral para construção de $S_i(x)$,
     \begin{equation}
-    S_i(x) = M_{i-1} \cdot \frac{(x_i - x)^3}{6h_i} + M_i \cdot \frac{(x-x_{i-1})^3}{6h_i}+(f_{i-1} - M_{i-1} \cdot \frac{h_i^2}{6})\cdot \frac{(x_i - x)}{h_i} + (f_i - M_i \cdot \frac{h_i^2}{6})\cdot \frac{(x-x_{i-1})}{h_i}&&
+        S_i(x) = M_{i-1} \cdot \frac{(x_i - x)^3}{6h_i} + M_i \cdot \frac{(x-x_{i-1})^3}{6h_i}+(f_{i-1} - M_{i-1} \cdot \frac{h_i^2}{6})\cdot \frac{(x_i - x)}{h_i} + (f_i - M_i \cdot \frac{h_i^2}{6})\cdot \frac{(x-x_{i-1})}{h_i}
     \end{equation}
     obtém-se a seguinte equação do spline cúbico natural:
     \begin{equation}
@@ -298,17 +288,80 @@ A função a ser estudade é $f(x) = x^2 + \sin(6x)$ para $x \in \mathopen[-1,1\
         plt.plot(x, ff, label = 'f(x)')
         plt.plot(x, y, 'r-', label = 's(x)')
     \end{verbatim}
-    
+
     O gráfico obtido com o código descrito foi o seguinte:
+    
     \begin{figure}
         \includegraphics[width=\linewidth]{ex1-spline.png}
         \caption{Spline cúbico natural do conjunto de pontos do exercício 1}
         \label{fig:spline1}
     \end{figure}
     %Figure \ref{fig:spline1} shows a the spline
+
+    \item É possível observar e comparar a capacidade de aproximação dos dois métodos comparando a $f(x)$, ou seja, observamos o comportamento que $\abs{f(x)-g(x)}$ e $\abs{f(x)-s(x)}$ tomam como gráficos:
+
+    Como é observável do da representação gráfica acima, $s(x)$ mostra ser melhor de forma geral a aproximar os valores do que $g(x)$.
+
+    \item Calculemos agora os erros cometidos ao calcular $f(0.1)$ e $f(0.9)$ pelos dois métodos abordados:
+    \begin{itemize}
+        \item \textbf{\textit{Erro (Método de Newton:)}}
+            Todos os métodos de interpolação seguem o mesmo método do cálculo do erro, sendo este:
+            \begin{quote}
+                \centering
+                    \[E(x)=\frac{1}{(n+1)!}f^{n+1}(C_x)\pi_n(x)\]
+            \end{quote}
+
+            \[C_x \in \mathopen[-1,1\mathclose]\]
+            \[\pi_n(x) = (x-x_0)(x-x_1)...(x-x_n)\]
+
+            Sendo assim, tendo $n+1 = 8$ pontos, tem-se que $n = 7$:
+
+            $f^8(C_x) = 6^8sin(6C_x)$ \\
+
+            Sabe-se que a função $sin(x)$ é contínua sendo apenas $f^8$ uma função resultante da multiplicação de constantes à função seno, logo é verificável que $f^8$ seja contínua. \\
+
+            É pretendido fazer o majoramento do erro, logo é necessário calcular $\max(\abs{f^8(x)})$ no intervalo dado. Para tal sabe-se que entre $[1,-1]$, $\sen(x)$ passa por dois máximos locais ($-\frac{\pi}{2}$ e $\frac{\pi}{2}$), sendo assim temos que:
+            \[6x = \frac{\pi}{2} \Leftrightarrow x = \frac{\pi}{12}\]
+
+            Concluindo:
+            \[\abs{f^8(\frac{\pi}{12})} = \abs{6^8\sin(\frac{\pi}{2})}\]
+
+            Calculando as restantes componentes da equação obtém-se:
+            \[E(x) = \frac{\abs{6^8\sin(\frac{\pi}{2})}}{8!}\times \pi_7(x)\]
+
+            Basta aplicar a fórmula ao valores dados ($0.1$ e $0.9$, respetivamente):
+            \[E(0.1) = 3.8\times 10^{-2}\]
+            \[E(0.9) = 1.2\]
+    \end{itemize}
 \end{itemize}
 
+\section*{Exercício 2}
+
+Pretende-se construir um polinómio interpolador e um spline cúbico tendo em conta os valores da seguinte tabela:
+
+\begin{center}
+    \begin{tabular} {|| c | c | c | c | c | c | c | c | c | c | c | c | c ||} \hline
+        $x_i$ & $1$ & $2$ & $3$ & $4$ & $5$ & $6$ & $7$ & $8$ & $9$ & $10$ & $11$ & $12$\\ [0.4ex]\hline
+        $f(x_i)$ & $8.6$ & $7.0$ & $6.4$ & $4.0$ & $2.8$ & $1.8$ & $1.8$ & $2.1$ & $3.2$ & $4.7$ & $6.2$ & $7.6$ \\ [0.4ex]\hline
+    \end{tabular}
+\end{center}
+
+Visto que o método de interpolação de Newton e a construção de splines cúbicas é processo aplicado no exercício 1, anterior, usufrui-se de toda a explicação e material usado no exercício 1, obtendo-se assim o seguinte gráfico:
+
+\begin{quote}
+    \centering
+        \begin{tikzpicture}
+            \begin{axis} [xmin=0, xmax=14, axis lines=left, xlabel=$x$, ylabel=$y$]
+                \addplot[color=red]
+                table[meta=Y]
+                {ex2.txt};
+                \addlegendentry{$f(x)$}
+                \addplot[color=green]
+                table[meta=Y]
+                {newtonOut2.txt};
+                \addlegendentry{$p(x)$}
+            \end{axis}
+        \end{tikzpicture}
+\end{quote}
 
 \end{document}
-
-
